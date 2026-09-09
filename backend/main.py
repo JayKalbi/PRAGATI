@@ -10,20 +10,16 @@ app = FastAPI(title="PRAGATI Disaster Intelligence API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# CHANGED: GET route at root "/" returning required status
 @app.get("/")
 def root():
-    return {
-        "project": "PRAGATI Disaster Intelligence API",
-        "status": "online",
-        "websocket_endpoint": "/ws",
-        "documentation": "/docs"
-    }
+    return {"status": "PRAGATI API Running", "version": "1.0"}
 
 # -------------------------------------------------------------
 # Global State
