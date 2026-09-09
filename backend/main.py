@@ -16,6 +16,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {
+        "project": "PRAGATI Disaster Intelligence API",
+        "status": "online",
+        "websocket_endpoint": "/ws",
+        "documentation": "/docs"
+    }
+
 # -------------------------------------------------------------
 # Global State
 # -------------------------------------------------------------
