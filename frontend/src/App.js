@@ -13,40 +13,63 @@ export default function App() {
 
   useEffect(() => {
     let reconnectTimer = null;
+    let initialTimer = null;
+    let isMounted = true;
 
     const connectWebSocket = () => {
+      if (!isMounted) return;
+
       const ws = new WebSocket(BACKEND_WS);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setConnected(true);
+        if (isMounted) setConnected(true);
       };
 
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          setData(payload);
-          setRainfallInput(payload.rainfall_rate);
+          if (isMounted) {
+            setData(payload);
+            setRainfallInput(payload.rainfall_rate);
+          }
         } catch (e) {
           console.error("WS Parse Error:", e);
         }
       };
 
       ws.onclose = () => {
-        setConnected(false);
-        reconnectTimer = setTimeout(connectWebSocket, 2000);
+        if (isMounted) {
+          setConnected(false);
+          reconnectTimer = setTimeout(connectWebSocket, 2000);
+        }
       };
 
       ws.onerror = () => {
-        ws.close();
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
       };
     };
 
-    connectWebSocket();
+    // 500ms initial delay to ensure backend is fully ready
+    initialTimer = setTimeout(() => {
+      connectWebSocket();
+    }, 500);
 
     return () => {
-      if (wsRef.current) wsRef.current.close();
+      isMounted = false;
+      if (initialTimer) clearTimeout(initialTimer);
       if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (wsRef.current) {
+        // Safe check: Only close if currently OPEN or CONNECTING
+        if (
+          wsRef.current.readyState === WebSocket.OPEN ||
+          wsRef.current.readyState === WebSocket.CONNECTING
+        ) {
+          wsRef.current.close();
+        }
+      }
     };
   }, []);
 
