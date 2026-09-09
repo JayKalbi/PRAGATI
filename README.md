@@ -37,8 +37,7 @@ Urban flooding in Indian metropolitan cities is rapid, spatially heterogeneous, 
 
 ## 📸 System Screenshot
 
-![PRAGATI Command & Control Center](https://raw.githubusercontent.com/JayKalbi/PRAGATI/main/docs/dashboard_preview.png)
-*(Run locally to view the live dark-mode command center interface)*
+![PRAGATI Command & Control Center](./docs/dashboard_preview.png)
 
 ---
 
