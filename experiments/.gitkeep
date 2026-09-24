@@ -1,0 +1,2 @@
+# Experiments and Run Logs Directory
+# Stores reproducible run artifacts, training logs, metrics JSONs, and model checkpoints under experiments/runs/.

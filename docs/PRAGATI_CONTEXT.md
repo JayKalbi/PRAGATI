@@ -82,3 +82,15 @@ Evaluated at operational inundation thresholds (e.g., $d \ge 0.15\text{m}$, $d \
 ### D. Operational Feasibility
 - **Latency:** PG-STGNN inference latency, AETHER gating latency, simulation refinement latency, and MILP solve time
 - **Resource Constraints:** Lead time gained for emergency response crews
+
+---
+
+## 6. Scope Boundaries & Technical Discipline
+
+As specified in the PRAGATI master proposal:
+- **No Claim of Full Digital Twin:** The architecture is *digital-twin-inspired* connecting sensing, graph representation, prediction, simulation, and feedback; it does not claim full hydrodynamic or complete municipal digital twin fidelity.
+- **Surface Flow vs Complete Underground Hydraulics:** The MVP simulator is a *Rapid Terrain-Driven Surface-Flow Simulator* for synthetic ground truth and rapid refinement, avoiding unsubstantiated claims of solving full 2D shallow-water equations or municipal pipe network equations.
+- **Graph Topology:** The spatial graph is a relational spatial network with terrain-aware directed/undirected attributes, *not* a DAG.
+- **AETHER Gate:** AETHER is an active reliability chokepoint (Release / Refine / Abstain), not merely an uncertainty quantification module.
+- **Human Authority:** All consequential resource allocations remain recommendations subject to mandatory human command approval.
+
