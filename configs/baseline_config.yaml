@@ -1,0 +1,48 @@
+# Frozen Scientific Baseline Configuration for PRAGATI
+
+spatial:
+  h3_resolution: 9
+
+temporal:
+  timestep_minutes: 15
+  lookback_hours: 6.0
+  forecast_horizons_hours: [2.0, 4.0, 6.0]
+
+target:
+  name: "inundation_depth"
+  unit: "metres"
+  reference_level: "local_ground"
+
+graph:
+  directed: true
+  max_neighbors: 6
+  edge_attributes:
+    - "elevation_diff"
+    - "slope"
+    - "flow_direction_compatibility"
+    - "flow_accumulation"
+    - "distance"
+
+model:
+  name: "PG-STGNN"
+  spatial_encoder: "GraphSAGE"
+  temporal_encoder: "GRU"
+  hidden_dim: 64
+  latent_embedding_dim: 64
+  ensemble_size: 3
+  random_seeds: [42, 1337, 2026]
+  loss:
+    lambda_continuity: 0.1
+    lambda_spatial: 0.05
+    lambda_temporal: 0.05
+
+aether:
+  ood_mahalanobis_threshold: 3.0
+  ensemble_variance_threshold: 0.04
+  min_sensor_quality_score: 0.70
+  physics_residual_threshold: 0.05
+
+simulation:
+  name: "Rapid Terrain-Driven Surface-Flow Simulator"
+  cell_area_sqm: 10000.0  # approximate nominal area for H3 res 9
+  default_infiltration_rate_mm_hr: 5.0

@@ -1,0 +1,4 @@
+# Raw data sources (telemetry dumps, external DEMs, shapefiles)
+# Keep data out of version control
+*
+!.gitignore
