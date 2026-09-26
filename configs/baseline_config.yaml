@@ -62,3 +62,12 @@ simulation:
   name: "Rapid Terrain-Driven Surface-Flow Simulator"
   cell_area_sqm: 10000.0  # approximate nominal area for H3 res 9
   default_infiltration_rate_mm_hr: 5.0
+  manning_n: 0.03
+  runoff_coefficient: 0.20
+  cfl_safety_factor: 0.5
+  infiltration_model: "exponential_decay"
+  infiltration_initial_mm_per_hr: 20.0
+  infiltration_residual_mm_per_hr: 2.0
+  infiltration_decay_constant_hr: 1.0
+  max_depth_m: 5.0
+

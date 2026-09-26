@@ -7,6 +7,7 @@ from pragati.config import (
     GraphConfig,
     ModelConfig,
     PragatiConfig,
+    SimulationConfig,
     SpatialConfig,
     TemporalConfig,
 )
@@ -145,4 +146,33 @@ def test_graph_config_ablation_settings() -> None:
     assert flat_cfg.mode == "flat"
     assert flat_cfg.direction_policy == "bidirectional"
     assert flat_cfg.use_edge_attr is False
+
+
+def test_simulation_config_defaults() -> None:
+    """Verify default simulation parameters match frozen baseline physics specifications."""
+    sim_cfg = SimulationConfig()
+    assert sim_cfg.manning_n == 0.03
+    assert sim_cfg.runoff_coefficient == 0.20
+    assert sim_cfg.cfl_safety_factor == 0.5
+    assert sim_cfg.infiltration_model == "exponential_decay"
+    assert sim_cfg.infiltration_initial_mm_per_hr == 20.0
+    assert sim_cfg.infiltration_residual_mm_per_hr == 2.0
+    assert sim_cfg.infiltration_decay_constant_hr == 1.0
+    assert sim_cfg.max_depth_m == 5.0
+    assert sim_cfg.cell_area_sqm == 10000.0
+
+
+def test_simulation_config_custom_values() -> None:
+    """Verify custom configuration overrides for constant infiltration or alternate roughness."""
+    sim_cfg = SimulationConfig(
+        manning_n=0.04,
+        infiltration_model="constant",
+        default_infiltration_rate_mm_hr=10.0,
+        cfl_safety_factor=0.3,
+    )
+    assert sim_cfg.manning_n == 0.04
+    assert sim_cfg.infiltration_model == "constant"
+    assert sim_cfg.default_infiltration_rate_mm_hr == 10.0
+    assert sim_cfg.cfl_safety_factor == 0.3
+
 

@@ -188,11 +188,42 @@ class AetherConfig(BaseModel):
 
 
 class SimulationConfig(BaseModel):
-    """Rapid Terrain-Driven Surface-Flow Simulator parameters."""
+    """Rapid Terrain-Driven Surface-Flow Simulator parameters.
+
+    Physical model parameters for explicit finite-volume surface water routing on the H3 grid.
+    """
 
     name: str = "Rapid Terrain-Driven Surface-Flow Simulator"
     cell_area_sqm: float = 10000.0  # Approx nominal area for H3 res 9
     default_infiltration_rate_mm_hr: float = 5.0
+    manning_n: float = Field(
+        default=0.03, gt=0.0, description="Manning roughness coefficient for overland sheet flow."
+    )
+    runoff_coefficient: float = Field(
+        default=0.20,
+        ge=0.0,
+        le=1.0,
+        description="Fraction of rainfall lost to initial depression/retention before overland flow.",
+    )
+    cfl_safety_factor: float = Field(
+        default=0.5,
+        gt=0.0,
+        le=1.0,
+        description="Maximum fraction of cell water volume allowable for outflow in a single time step.",
+    )
+    infiltration_model: Literal["constant", "exponential_decay"] = "exponential_decay"
+    infiltration_initial_mm_per_hr: float = Field(
+        default=20.0, ge=0.0, description="Initial potential infiltration rate in Horton-style decay."
+    )
+    infiltration_residual_mm_per_hr: float = Field(
+        default=2.0, ge=0.0, description="Asymptotic saturated infiltration rate in Horton-style decay."
+    )
+    infiltration_decay_constant_hr: float = Field(
+        default=1.0, gt=0.0, description="Horton infiltration decay constant (in hours)."
+    )
+    max_depth_m: float = Field(
+        default=5.0, gt=0.0, description="Physical upper ceiling clamp for surface inundation depth in metres."
+    )
 
 
 class PragatiConfig(BaseModel):
