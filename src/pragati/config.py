@@ -194,7 +194,15 @@ class SimulationConfig(BaseModel):
     """
 
     name: str = "Rapid Terrain-Driven Surface-Flow Simulator"
-    cell_area_sqm: float = 10000.0  # Approx nominal area for H3 res 9
+    cell_area_sqm: float = Field(
+        default=10000.0,
+        description=(
+            "Nominal fallback cell area in m^2. NOTE: The simulator uses "
+            "pragati.graph.h3_utils.cell_area_m2(cell) for the true per-cell H3 "
+            "surface area; this field is retained only as a reference value for "
+            "documentation and future grid-agnostic code paths."
+        ),
+    )
     default_infiltration_rate_mm_hr: float = 5.0
     manning_n: float = Field(
         default=0.03, gt=0.0, description="Manning roughness coefficient for overland sheet flow."
