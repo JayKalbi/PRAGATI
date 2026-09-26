@@ -81,10 +81,34 @@ class TargetConfig(BaseModel):
 
 
 class GraphConfig(BaseModel):
-    """Topological and terrain-aware edge configuration."""
+    """Topological and terrain-aware edge configuration.
 
+    Note:
+        The combination of mode='flat' and use_edge_attr=False serves as the
+        established flat-graph baseline for RQ1 ablation.
+    """
+
+    # Graph mode: 'terrain_aware' incorporates D8 attributes; 'flat' strips terrain edges (RQ1 baseline)
+    mode: Literal["terrain_aware", "flat"] = "terrain_aware"
+    # Direction policy: 'downhill' filters edges to strictly downhill flow; 'bidirectional' retains both
+    direction_policy: Literal["downhill", "bidirectional"] = "downhill"
     directed: bool = True
     max_neighbors: int = 6
+    # Whether to construct and attach edge_attr tensor to PyG Data object (False for RQ1 flat baseline)
+    use_edge_attr: bool = True
+    node_features: List[str] = Field(
+        default_factory=lambda: [
+            "depth",
+            "rainfall",
+            "elevation",
+            "slope_sin",
+            "slope_cos",
+            "aspect_sin",
+            "aspect_cos",
+            "flow_accumulation",
+            "sensor_quality",
+        ]
+    )
     edge_attributes: List[str] = Field(
         default_factory=lambda: [
             "elevation_diff",

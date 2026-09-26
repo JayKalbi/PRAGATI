@@ -119,3 +119,30 @@ def test_load_repository_baseline_yaml() -> None:
     assert config.spatial.h3_resolution == 9
     assert config.temporal.lookback_timesteps == 24
     assert config.temporal.horizon_timesteps == [8, 16, 24]
+    assert config.graph.mode == "terrain_aware"
+    assert config.graph.direction_policy == "downhill"
+    assert config.graph.use_edge_attr is True
+
+
+def test_graph_config_defaults() -> None:
+    """Verify default graph configuration settings for frozen baseline."""
+    graph_cfg = GraphConfig()
+    assert graph_cfg.mode == "terrain_aware"
+    assert graph_cfg.direction_policy == "downhill"
+    assert graph_cfg.use_edge_attr is True
+    assert "elevation" in graph_cfg.node_features
+    assert "flow_accumulation" in graph_cfg.node_features
+    assert len(graph_cfg.edge_attributes) == 5
+
+
+def test_graph_config_ablation_settings() -> None:
+    """Verify RQ1 ablation flat graph configuration initialization."""
+    flat_cfg = GraphConfig(
+        mode="flat",
+        direction_policy="bidirectional",
+        use_edge_attr=False,
+    )
+    assert flat_cfg.mode == "flat"
+    assert flat_cfg.direction_policy == "bidirectional"
+    assert flat_cfg.use_edge_attr is False
+

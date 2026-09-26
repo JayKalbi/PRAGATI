@@ -14,8 +14,24 @@ target:
   reference_level: "local_ground"
 
 graph:
+  # Mode: 'terrain_aware' (frozen baseline) or 'flat' (RQ1 ablation baseline)
+  mode: "terrain_aware"
+  # Direction policy: 'downhill' (directed downhill) or 'bidirectional' (ablation)
+  direction_policy: "downhill"
   directed: true
   max_neighbors: 6
+  # Use edge attributes: True for terrain-aware, False for flat graph ablation (RQ1 baseline)
+  use_edge_attr: true
+  node_features:
+    - "depth"
+    - "rainfall"
+    - "elevation"
+    - "slope_sin"
+    - "slope_cos"
+    - "aspect_sin"
+    - "aspect_cos"
+    - "flow_accumulation"
+    - "sensor_quality"
   edge_attributes:
     - "elevation_diff"
     - "slope"
