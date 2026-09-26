@@ -1,5 +1,9 @@
 """PyTorch Geometric graph construction and D8 flow-accumulation edge computations."""
 
+# NOTE: Equal-elevation neighbors ARE retained under 'downhill' policy.
+# Rationale: preserves graph connectivity for flat terrain.
+# If strict-downhill is desired for ablation, change condition to v_elev >= u_elev - 1e-4.
+
 import math
 from typing import Dict, List, Optional, Tuple
 import numpy as np
