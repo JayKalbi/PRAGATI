@@ -75,7 +75,7 @@ def test_zero_rainfall_no_change(sim_setup) -> None:
 
     assert np.all(traj.depths_m == 0.0)
     assert np.all(traj.cumulative_infiltrated_m == 0.0)
-    assert traj.mass_balance_error() < 1e-12
+    assert traj.mass_balance_error(areas_m2=sim.areas_m2) < 1e-12
 
 
 def test_non_negativity_under_heavy_rain(sim_setup) -> None:
@@ -122,7 +122,7 @@ def test_mass_balance_closed_domain(sim_setup) -> None:
     rain_series = np.array([5.0, 10.0, 15.0, 12.0, 8.0, 4.0, 0.0, 0.0])
     traj = sim.run(init_state, rain_series)
 
-    rel_error = traj.relative_mass_balance_error(runoff_coefficient=0.20)
+    rel_error = traj.relative_mass_balance_error(areas_m2=sim.areas_m2, runoff_coefficient=0.20)
     assert rel_error < 1e-9, f"Mass balance error too high without infiltration: {rel_error}"
 
 
@@ -141,7 +141,7 @@ def test_mass_balance_with_infiltration(sim_setup) -> None:
     rain_series = np.full(24, 15.0)  # 15 mm every 15 mins for 6 hours
     traj = sim.run(init_state, rain_series)
 
-    rel_error = traj.relative_mass_balance_error(runoff_coefficient=cfg.runoff_coefficient)
+    rel_error = traj.relative_mass_balance_error(areas_m2=sim.areas_m2, runoff_coefficient=cfg.runoff_coefficient)
     assert rel_error < 1e-9, f"Mass balance error too high with infiltration: {rel_error}"
 
 
@@ -255,6 +255,7 @@ def test_trajectory_save_load_roundtrip(tmp_path: Path, sim_setup) -> None:
     assert loaded.timestep_minutes == traj.timestep_minutes
     np.testing.assert_array_equal(loaded.depths_m, traj.depths_m)
     np.testing.assert_array_equal(loaded.cumulative_infiltrated_m, traj.cumulative_infiltrated_m)
+    np.testing.assert_array_equal(loaded.areas_m2, traj.areas_m2)
 
 
 def test_simulator_determinism(sim_setup) -> None:

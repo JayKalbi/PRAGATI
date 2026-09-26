@@ -26,7 +26,7 @@ class SimulationTrajectory:
     cumulative_infiltrated_m: np.ndarray
     areas_m2: np.ndarray
 
-    def mass_balance_error(self, runoff_coefficient: float = 0.20) -> float:
+    def mass_balance_error(self, areas_m2: np.ndarray, runoff_coefficient: float = 0.20) -> float:
         """Compute closed-domain mass conservation balance error in cubic metres (m^3).
 
         For a closed system without external boundary drainage:
@@ -38,43 +38,52 @@ class SimulationTrajectory:
             V_rain_applied = sum_t( sum_i( (P_i(t) / 1000.0) * (1.0 - runoff_coefficient) * A_i ) )
             V_infiltrated  = sum_i( cumulative_infiltrated_m(T) * A_i )
 
+        Args:
+            areas_m2: Fixed surface area of each cell in m^2, shape (N,). Required.
+            runoff_coefficient: Runoff reduction fraction (default 0.20).
+
         Returns:
             float: Absolute discrepancy in m^3: |(V_initial + V_rain_applied) - (V_final + V_infiltrated)|.
         """
+        areas = np.asarray(areas_m2, dtype=np.float64)
+        if areas.shape != (len(self.cells),):
+            raise ValueError(f"areas_m2 shape {areas.shape} must match cells length {len(self.cells)}")
+
         # 1. Surface water volumes
-        v_initial = float(np.sum(self.depths_m[0] * self.areas_m2))
-        v_final = float(np.sum(self.depths_m[-1] * self.areas_m2))
+        v_initial = float(np.sum(self.depths_m[0] * areas))
+        v_final = float(np.sum(self.depths_m[-1] * areas))
 
         # 2. Cumulative infiltration volume
-        v_infiltrated = float(np.sum(self.cumulative_infiltrated_m[-1] * self.areas_m2))
+        v_infiltrated = float(np.sum(self.cumulative_infiltrated_m[-1] * areas))
 
         # 3. Applied net rainfall volume across all steps
         # rainfall_mm can be shape (T, N) or (T,)
         if self.rainfall_mm.ndim == 1:
             # (T,) scalar per timestep broadcasted over all cells
             total_rain_depth_m = float(np.sum(self.rainfall_mm)) / 1000.0
-            v_rain_applied = total_rain_depth_m * (1.0 - runoff_coefficient) * float(np.sum(self.areas_m2))
+            v_rain_applied = total_rain_depth_m * (1.0 - runoff_coefficient) * float(np.sum(areas))
         else:
             # (T, N) spatially variable rainfall
             rain_m = (self.rainfall_mm / 1000.0) * (1.0 - runoff_coefficient)  # shape (T, N)
-            v_rain_applied = float(np.sum(rain_m * self.areas_m2))
+            v_rain_applied = float(np.sum(rain_m * areas))
 
         expected_total = v_initial + v_rain_applied
         actual_total = v_final + v_infiltrated
 
         return float(abs(expected_total - actual_total))
 
-    def relative_mass_balance_error(self, runoff_coefficient: float = 0.20) -> float:
+    def relative_mass_balance_error(self, areas_m2: np.ndarray, runoff_coefficient: float = 0.20) -> float:
         """Compute relative mass balance discrepancy normalized by total water entering system."""
-        abs_err = self.mass_balance_error(runoff_coefficient=runoff_coefficient)
-        v_initial = float(np.sum(self.depths_m[0] * self.areas_m2))
+        areas = np.asarray(areas_m2, dtype=np.float64)
+        abs_err = self.mass_balance_error(areas_m2=areas, runoff_coefficient=runoff_coefficient)
+        v_initial = float(np.sum(self.depths_m[0] * areas))
 
         if self.rainfall_mm.ndim == 1:
             total_rain_depth_m = float(np.sum(self.rainfall_mm)) / 1000.0
-            v_rain = total_rain_depth_m * (1.0 - runoff_coefficient) * float(np.sum(self.areas_m2))
+            v_rain = total_rain_depth_m * (1.0 - runoff_coefficient) * float(np.sum(areas))
         else:
             rain_m = (self.rainfall_mm / 1000.0) * (1.0 - runoff_coefficient)
-            v_rain = float(np.sum(rain_m * self.areas_m2))
+            v_rain = float(np.sum(rain_m * areas))
 
         total_water = v_initial + v_rain
         if total_water < 1e-9:

@@ -75,10 +75,10 @@ def main() -> None:
     final_depths = trajectory.depths_m[-1]
     peak_depth = float(np.max(trajectory.depths_m))
     mean_final_depth = float(np.mean(final_depths))
-    mass_balance_error_m3 = trajectory.mass_balance_error()
-    # Compute relative mass balance error
-    total_rain_vol = float(np.sum(rainfall_series * (1.0 - sim_cfg.runoff_coefficient) / 1000.0 * simulator.areas_m2[0]))
-    rel_mass_balance_error = abs(mass_balance_error_m3) / total_rain_vol if total_rain_vol > 0 else 0.0
+    mass_balance_error_m3 = trajectory.mass_balance_error(areas_m2=simulator.areas_m2)
+    rel_mass_balance_error = trajectory.relative_mass_balance_error(
+        areas_m2=simulator.areas_m2, runoff_coefficient=sim_cfg.runoff_coefficient
+    )
 
     print("=" * 60)
     print("PRAGATI Surface-Flow Simulator (Phase 3A Demo)")
